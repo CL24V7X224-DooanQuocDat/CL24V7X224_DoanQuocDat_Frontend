@@ -10,6 +10,7 @@
       />
       <ErrorMessage name="name" class="error-feedback" />
     </div>
+
     <div class="form-group">
       <label for="email">E-mail</label>
       <Field
@@ -20,6 +21,7 @@
       />
       <ErrorMessage name="email" class="error-feedback" />
     </div>
+
     <div class="form-group">
       <label for="address">Địa chỉ</label>
       <Field
@@ -30,6 +32,7 @@
       />
       <ErrorMessage name="address" class="error-feedback" />
     </div>
+
     <div class="form-group">
       <label for="phone">Điện thoại</label>
       <Field
@@ -40,6 +43,29 @@
       />
       <ErrorMessage name="phone" class="error-feedback" />
     </div>
+
+    <div class="form-group">
+      <label for="company">Công ty</label>
+      <Field
+        name="company"
+        type="text"
+        class="form-control"
+        v-model="contactLocal.company"
+      />
+      <ErrorMessage name="company" class="error-feedback" />
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Ghi chú</label>
+      <Field
+        name="notes"
+        as="textarea"
+        class="form-control"
+        v-model="contactLocal.notes"
+      />
+      <ErrorMessage name="notes" class="error-feedback" />
+    </div>
+
     <div class="form-group form-check">
       <input
         name="favorite"
@@ -51,18 +77,33 @@
         <strong>Liên hệ yêu thích</strong>
       </label>
     </div>
+
+    <div class="form-group form-check">
+      <input
+        name="colleague"
+        type="checkbox"
+        class="form-check-input"
+        v-model="contactLocal.colleague"
+      />
+      <label for="colleague" class="form-check-label">
+        <strong>Đồng nghiệp</strong>
+      </label>
+    </div>
+
     <div class="form-group">
-      <button class="btn btn-primary"><i class="fas fa-save"></i>Lưu</button>
+      <button class="btn btn-primary">
+        <i class="fas fa-save"></i> Lưu
+      </button>
       <button
         v-if="contactLocal._id"
         type="button"
         class="ml-2 btn btn-danger"
-        @click="deleteContact"><i class="fas fa-trash"></i>
-        Xóa
+        @click="deleteContact"
+      >
+        <i class="fas fa-trash"></i> Xóa
       </button>
       <button type="button" class="ml-2 btn btn-danger" @click="Cancel">
-        <i class="fas fa-times"></i>
-        Thoát
+        <i class="fas fa-times"></i> Thoát
       </button>
     </div>
   </Form>
@@ -100,16 +141,22 @@ export default {
           /((09|03|07|08|05)+([0-9]{8})\b)/g,
           "Số điện thoại không hợp lệ."
         ),
+      // Thêm validation cho các trường mới (đặt là optional)
+      company: yup.string().max(100, "Công ty tối đa 100 ký tự."),
+      notes: yup.string().max(500, "Ghi chú tối đa 500 ký tự."),
+      colleague: yup.boolean(),
     });
     return {
-      // Chúng ta sẽ không muốn hiệu chỉnh props, nên tạo biến cục bộ
-      // contactLocal để liên kết với các input trên form
-      contactLocal: this.contact,
+      // SỬA LỖI QUAN TRỌNG:
+      // Phải tạo bản sao của prop 'contact' để tránh sửa trực tiếp prop.
+      // Sử dụng toán tử spread '...' để tạo một object mới.
+      contactLocal: { ...this.contact },
       contactFormSchema,
     };
   },
   methods: {
     submitContact() {
+      // Gửi 'contactLocal' (bản sao đã được chỉnh sửa) lên component cha
       this.$emit("submit:contact", this.contactLocal);
     },
     deleteContact() {
